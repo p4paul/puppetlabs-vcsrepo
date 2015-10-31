@@ -26,7 +26,23 @@ describe 'create a repo' do
     end
 
     describe file("#{tmpdir}/testrepo_blank_repo/.git") do
-      it { should be_directory }
+      it { is_expected.to be_directory }
+    end
+  end
+
+  context 'no source but revision provided' do
+    it 'should not fail (MODULES-2125)' do
+      pp = <<-EOS
+      vcsrepo { "#{tmpdir}/testrepo_blank_with_revision_repo":
+        ensure   => present,
+        provider => git,
+        revision => 'master'
+      }
+      EOS
+
+      # Run it twice and test for idempotency
+      apply_manifest(pp, :catch_failures => true)
+      apply_manifest(pp, :catch_changes => true)
     end
   end
 
@@ -45,11 +61,11 @@ describe 'create a repo' do
     end
 
     describe file("#{tmpdir}/testrepo_bare_repo/config") do
-      it { should contain 'bare = true' }
+      it { is_expected.to contain 'bare = true' }
     end
 
     describe file("#{tmpdir}/testrepo_bare_repo/.git") do
-      it { should_not be_directory }
+      it { is_expected.not_to be_directory }
     end
   end
 
@@ -67,7 +83,7 @@ describe 'create a repo' do
     end
 
     describe file("#{tmpdir}/testrepo_bare_repo_rev") do
-      it { should_not be_directory }
+      it { is_expected.not_to be_directory }
     end
   end
 end
